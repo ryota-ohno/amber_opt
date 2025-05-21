@@ -122,7 +122,7 @@ def make_xyz(monomer_name,params_dict,structure_type):
             val = np.round(val,2)
         elif key in ['A1','A2','theta']:
             val = int(val)
-        xyzfile_name += '_{}={}'.format(key,val)
+        xyzfile_name += '_{}_{}'.format(key,val)
     return xyzfile_name + f'_{structure_type}.xyz'
 
 def make_gjf_xyz(auto_dir,monomer_name,params_dict,structure_type):
@@ -163,7 +163,7 @@ def get_file_name_from_dict(monomer_name,params_dict,structure_type):
             val = val
         elif key in ['A2','theta']:
             val = int(val)
-        file_name += '_{}={}'.format(key,val)
+        file_name += '_{}_{}'.format(key,val)
     return file_name + f'_{structure_type}.mol2'
     
 def exec_gjf(auto_dir, monomer_name, params_dict,structure_type,isTest=True):
