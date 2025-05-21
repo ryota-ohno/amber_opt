@@ -153,7 +153,6 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
                 auto_csv_1 = os.path.join(auto_dir,'step1_1.csv');df_E_1 = pd.read_csv(auto_csv_1)
                 df_sub_1 = filter_df(df_E_1, params_dict1)
                 if len(df_sub_1) == 0:
-                    print('debug1')
                     file_name = exec_gjf(auto_dir, monomer_name, {**params_dict1}, structure_type=1,isTest=isTest)
                     df_newline_1 = pd.Series({**params_dict1,'E1':0.,'status':'InProgress','file_name':file_name})
                     df_E_new_1=pd.concat([df_E_1,df_newline_1.to_frame().T],axis=0,ignore_index=True);df_E_new_1.to_csv(auto_csv_1,index=False)
@@ -260,7 +259,6 @@ def get_opt_params_dict(df_cur, init_params_dict,fixed_params_dict):
                                 continue
                             xyz_list.append([a,b]);E_list.append(df_val_xyz['E'].values[0])
         if len(para_list) != 0:
-            print(para_list)
             return False,para_list
         a_init,b_init = xyz_list[np.argmin(np.array(E_list))]
         if a_init==a_init_prev and b_init==b_init_prev:
