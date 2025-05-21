@@ -63,6 +63,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
         else:
             len_prg_1-=1
             E1=float(E_list1[0])-2*E_mono##8分子に向けてep1,ep2作成　ep1:b ep2:a
+            E1=np.round(E1,4)
             df_E_1.loc[idx, ['E1','status']] = [E1,'Done']
             df_E_1.to_csv(auto_csv_1,index=False)
             #time.sleep(1)
@@ -85,6 +86,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
         else:
             len_prg_2 -= 1
             E2 = float(E_list2[0]) -2*E_mono  # Updated to E2
+            E2=np.round(E2,4)
             df_E_2.loc[idx, ['E2', 'status']] = [E2, 'Done']
             df_E_2.to_csv(auto_csv_2, index=False)  # Updated to auto_csv_2
             #time.sleep(1)
@@ -107,6 +109,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
         else:
             len_prg_3 -= 1
             E3 = float(E_list3[0]) -2*E_mono # Updated to E3
+            E3=np.round(E3,4)
             df_E_3.loc[idx, ['E3', 'status']] = [E3, 'Done']
             df_E_3.to_csv(auto_csv_3, index=False)  # Updated to auto_csv_3
             break  # Break after one iteration
@@ -129,7 +132,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
             E2 = s2['E2'].values.tolist()[0]
             E3 = s3['E3'].values.tolist()[0]
             
-            E=2*E1+2*E2+4*E3
+            E=2*E1+2*E2+4*E3;E=np.round(E,4)
             df_E.loc[idx, ['E','E1','E2','E3','status']] = [E,E1,E2,E3,'Done']
             df_E.to_csv(auto_csv,index=False)
             break#2つ同時に計算終わったりしたらまずいので一個で切る
