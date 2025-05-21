@@ -34,7 +34,7 @@ def main_process(args):
         df_E_3 = pd.DataFrame(columns = ['theta','a','b','E3','machine_type','status','file_name'])##いじる
         df_E_3.to_csv(auto_csv_path3,index=False)##step3を二段階でやる場合二段階目ではinitをやらないので念のためmainにも組み込んでおく
 
-    os.chdir(os.path.join(args.auto_dir,'gaussian'))
+    os.chdir(os.path.join(args.auto_dir,'amber'))
     isOver = False
     while not(isOver):
         #check
@@ -52,7 +52,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
     for idx, row in df_prg_1.iterrows():
         params_dict1_ = row[fixed_param_keys + opt_param_keys_1 + ['file_name']].to_dict()
         file_name1=params_dict1_['file_name']##辞書をつくってそこにopt_1とopt_2でファイル名作成
-        log_filepath1 = os.path.join(*[auto_dir,'gaussian',file_name1])
+        log_filepath1 = os.path.join(*[auto_dir,'amber',file_name1])
         if not(os.path.exists(log_filepath1)):#logファイルが生成される直前だとまずいので
             continue
         E_list1=get_E(log_filepath1)
@@ -74,7 +74,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
     for idx, row in df_prg_2.iterrows():
         params_dict2_ = row[fixed_param_keys + opt_param_keys_2 + ['file_name']].to_dict()
         file_name2=params_dict2_['file_name']##辞書をつくってそこにopt_1とopt_2でファイル名作成
-        log_filepath2 = os.path.join(*[auto_dir, 'gaussian', file_name2])
+        log_filepath2 = os.path.join(*[auto_dir, 'amber', file_name2])
         if not(os.path.exists(log_filepath2)):
             continue
         E_list2 = get_E(log_filepath2)
@@ -96,7 +96,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
     for idx, row in df_prg_3.iterrows():
         params_dict3_ = row[fixed_param_keys + opt_param_keys_1 + opt_param_keys_2 + ['file_name']].to_dict()
         file_name3=params_dict3_['file_name']##辞書をつくってそこにopt_1とopt_2でファイル名作成
-        log_filepath3 = os.path.join(*[auto_dir, 'gaussian', file_name3])
+        log_filepath3 = os.path.join(*[auto_dir, 'amber', file_name3])
         if not (os.path.exists(log_filepath3)):
             continue
         E_list3 = get_E(log_filepath3)
@@ -288,7 +288,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     
     parser.add_argument('--isTest',action='store_true')
-    parser.add_argument('--auto-dir',type=str,help='path to dir which includes gaussian, gaussview and csv')
+    parser.add_argument('--auto-dir',type=str,help='path to dir which includes amber, gaussview and csv')
     parser.add_argument('--monomer-name',type=str,help='monomer name')
     parser.add_argument('--num-nodes',type=int,help='num nodes')
     ##maxnum-machine2 がない
