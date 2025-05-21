@@ -44,7 +44,7 @@ def main_process(args):
 def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取るか中身をばらして取るかの違い
     fixed_param_keys = ['theta'];opt_param_keys_1 = ['a'];opt_param_keys_2 = ['b']
     
-    mono_file=f'~/ohno_amber/{monomer_name}/monomer/{monomer_name}_mono.out'
+    mono_file=f'/Home/HasegawaLab/ohno_amber/{monomer_name}/monomer/{monomer_name}_mono.out'
     E_mono=get_E(mono_file)[0]
     auto_csv_1 = os.path.join(auto_dir,'step1_1.csv');df_E_1 = pd.read_csv(auto_csv_1)
     df_prg_1 = df_E_1.loc[df_E_1['status']=='InProgress',fixed_param_keys+opt_param_keys_1+['machine_type','file_name']]
@@ -132,7 +132,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
             df_E.to_csv(auto_csv,index=False)
             break#2つ同時に計算終わったりしたらまずいので一個で切る
     
-    dict_matrix = get_params_dict(auto_dir,num_nodes)##更新分を流す a1~z2まで取得
+    dict_matrix = get_params_dict(auto_dir,num_nodes)##更新分を流す a1/HOME/HASEGAWALABz2まで取得
     if len(dict_matrix)!=0:#終わりがまだ見えないなら
         for i in range(len(dict_matrix)):
             params_dict=dict_matrix[i]#print(params_dict)
