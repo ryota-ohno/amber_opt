@@ -21,17 +21,17 @@ def main_process(args):
 
     auto_csv_path1 = os.path.join(auto_dir,'step1_1.csv')
     if not os.path.exists(auto_csv_path1):        
-        df_E_1 = pd.DataFrame(columns = ['theta','a','E1','machine_type','status','file_name'])##いじる
+        df_E_1 = pd.DataFrame(columns = ['theta','a','E1','status','file_name'])##いじる
         df_E_1.to_csv(auto_csv_path1,index=False)##step3を二段階でやる場合二段階目ではinitをやらないので念のためmainにも組み込んでおく
 
     auto_csv_path2 = os.path.join(auto_dir,'step1_2.csv')
     if not os.path.exists(auto_csv_path2):        
-        df_E_2 = pd.DataFrame(columns = ['theta','b','E2','machine_type','status','file_name'])##いじる
+        df_E_2 = pd.DataFrame(columns = ['theta','b','E2','status','file_name'])##いじる
         df_E_2.to_csv(auto_csv_path2,index=False)##step3を二段階でやる場合二段階目ではinitをやらないので念のためmainにも組み込んでおく
 
     auto_csv_path3 = os.path.join(auto_dir,'step1_3.csv')
     if not os.path.exists(auto_csv_path3):        
-        df_E_3 = pd.DataFrame(columns = ['theta','a','b','E3','machine_type','status','file_name'])##いじる
+        df_E_3 = pd.DataFrame(columns = ['theta','a','b','E3','status','file_name'])##いじる
         df_E_3.to_csv(auto_csv_path3,index=False)##step3を二段階でやる場合二段階目ではinitをやらないので念のためmainにも組み込んでおく
 
     os.chdir(os.path.join(args.auto_dir,'amber'))
@@ -47,7 +47,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
     mono_file=f'/home/HasegawaLab/ohno_amber/amber_opt/{monomer_name}/monomer/{monomer_name}_mono.out'
     E_mono=get_E(mono_file)[0]
     auto_csv_1 = os.path.join(auto_dir,'step1_1.csv');df_E_1 = pd.read_csv(auto_csv_1)
-    df_prg_1 = df_E_1.loc[df_E_1['status']=='InProgress',fixed_param_keys+opt_param_keys_1+['machine_type','file_name']]
+    df_prg_1 = df_E_1.loc[df_E_1['status']=='InProgress',fixed_param_keys+opt_param_keys_1+['file_name']]
     len_prg_1=len(df_prg_1)
     for idx, row in df_prg_1.iterrows():
         params_dict1_ = row[fixed_param_keys + opt_param_keys_1 + ['file_name']].to_dict()
@@ -68,7 +68,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
     
     auto_csv_2 = os.path.join(auto_dir,'step1_2.csv')
     df_E_2 = pd.read_csv(auto_csv_2)
-    df_prg_2 = df_E_2.loc[df_E_2['status']=='InProgress', fixed_param_keys+opt_param_keys_2+['machine_type','file_name']]
+    df_prg_2 = df_E_2.loc[df_E_2['status']=='InProgress', fixed_param_keys+opt_param_keys_2+['file_name']]
     len_prg_2 = len(df_prg_2)
 
     for idx, row in df_prg_2.iterrows():
@@ -90,7 +90,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
     
     auto_csv_3 = os.path.join(auto_dir, 'step1_3.csv')
     df_E_3 = pd.read_csv(auto_csv_3)
-    df_prg_3 = df_E_3.loc[df_E_3['status'] == 'InProgress', fixed_param_keys + opt_param_keys_1 + opt_param_keys_2 + ['machine_type','file_name']]
+    df_prg_3 = df_E_3.loc[df_E_3['status'] == 'InProgress', fixed_param_keys + opt_param_keys_1 + opt_param_keys_2 + ['file_name']]
     len_prg_3 = len(df_prg_3)
 
     for idx, row in df_prg_3.iterrows():
@@ -152,9 +152,8 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
                 df_sub_1 = filter_df(df_E_1, params_dict1)
                 if len(df_sub_1) == 0:
                     print('debug1')
-                    machine_type = 1
-                    file_name = exec_gjf(auto_dir, monomer_name, {**params_dict1}, machine_type, structure_type=1,isTest=isTest)
-                    df_newline_1 = pd.Series({**params_dict1,'E1':0.,'machine_type':machine_type,'status':'InProgress','file_name':file_name})
+                    file_name = exec_gjf(auto_dir, monomer_name, {**params_dict1}, structure_type=1,isTest=isTest)
+                    df_newline_1 = pd.Series({**params_dict1,'E1':0.,'status':'InProgress','file_name':file_name})
                     df_E_new_1=pd.concat([df_E_1,df_newline_1.to_frame().T],axis=0,ignore_index=True);df_E_new_1.to_csv(auto_csv_1,index=False)
                     #time.sleep(0.1)
 
@@ -162,17 +161,16 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
                 auto_csv_2 = os.path.join(auto_dir,'step1_2.csv');df_E_2 = pd.read_csv(auto_csv_2)
                 df_sub_2 = filter_df(df_E_2, params_dict2)
                 if len(df_sub_2) == 0:
-                    machine_type = 1
-                    file_name = exec_gjf(auto_dir, monomer_name, {**params_dict2}, machine_type, structure_type=2,isTest=isTest)
-                    df_newline_2 = pd.Series({**params_dict2,'E2':0.,'machine_type':machine_type,'status':'InProgress','file_name':file_name})
+                    file_name = exec_gjf(auto_dir, monomer_name, {**params_dict2}, structure_type=2,isTest=isTest)
+                    df_newline_2 = pd.Series({**params_dict2,'E2':0.,'status':'InProgress','file_name':file_name})
                     df_E_new_2=pd.concat([df_E_2,df_newline_2.to_frame().T],axis=0,ignore_index=True);df_E_new_2.to_csv(auto_csv_2,index=False)
                     
                 ## 3の実行　##
                 auto_csv_3 = os.path.join(auto_dir,'step1_3.csv');df_E_3 = pd.read_csv(auto_csv_3)
                 df_sub_3 = filter_df(df_E_3, params_dict3)
                 if len(df_sub_3) == 0:
-                    file_name = exec_gjf(auto_dir, monomer_name, {**params_dict3}, machine_type, structure_type=3,isTest=isTest)
-                    df_newline_3 = pd.Series({**params_dict3,'E3':0.,'machine_type':machine_type,'status':'InProgress','file_name':file_name})
+                    file_name = exec_gjf(auto_dir, monomer_name, {**params_dict3},  structure_type=3,isTest=isTest)
+                    df_newline_3 = pd.Series({**params_dict3,'E3':0.,'status':'InProgress','file_name':file_name})
                     df_E_new_3=pd.concat([df_E_3,df_newline_3.to_frame().T],axis=0,ignore_index=True);df_E_new_3.to_csv(auto_csv_3,index=False)
     
     init_params_csv=os.path.join(auto_dir, 'step1_init_params.csv')
@@ -291,7 +289,6 @@ if __name__ == '__main__':
     parser.add_argument('--auto-dir',type=str,help='path to dir which includes amber, gaussview and csv')
     parser.add_argument('--monomer-name',type=str,help='monomer name')
     parser.add_argument('--num-nodes',type=int,help='num nodes')
-    ##maxnum-machine2 がない
     args = parser.parse_args()
 
     print("----main process----")
