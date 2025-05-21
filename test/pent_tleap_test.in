@@ -1,0 +1,5 @@
+source /home/center/opt/aarch64/apps/amber/19.0/dat/leap/cmd/leaprc.gaff
+MOL = loadmol2 pent_test.mol2
+loadamberparams pent_test.frcmod
+saveamberparm MOL pent_test.prmtop pent_test.inpcrd
+quit
