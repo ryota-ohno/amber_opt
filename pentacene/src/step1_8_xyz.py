@@ -7,13 +7,15 @@ from make_8_xyz import exec_gjf##計算した点のxyzfileを出す
 from utils import get_E
 import argparse
 import numpy as np
+import shutil
 
 def main_process(args):
     auto_dir = args.auto_dir
     os.makedirs(auto_dir, exist_ok=True)
     os.makedirs(os.path.join(auto_dir,'amber'), exist_ok=True)
     os.makedirs(os.path.join(auto_dir,'gaussview'), exist_ok=True)
-    
+    amber_path=os.path.join(auto_dir,'amber')
+    shutil.copy(f'/home/HasegawaLab/ohno_amber/amber_opt/{args.monomer_name}/src/FF_calc.in',amber_path)
     auto_csv_path = os.path.join(auto_dir,'step1.csv')
     if not os.path.exists(auto_csv_path):        
         df_E = pd.DataFrame(columns = ['theta','a','b','E','E1','E2','E3','status'])##いじる
