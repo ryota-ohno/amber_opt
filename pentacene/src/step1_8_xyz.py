@@ -44,6 +44,8 @@ def main_process(args):
 def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取るか中身をばらして取るかの違い
     fixed_param_keys = ['theta'];opt_param_keys_1 = ['a'];opt_param_keys_2 = ['b']
     
+    mono_file=f'~/ohno_amber/{monomer_name}/monomer/{monomer_name}_mono.out'
+    E_mono=get_E(mono_file)[0]
     auto_csv_1 = os.path.join(auto_dir,'step1_1.csv');df_E_1 = pd.read_csv(auto_csv_1)
     df_prg_1 = df_E_1.loc[df_E_1['status']=='InProgress',fixed_param_keys+opt_param_keys_1+['machine_type','file_name']]
     len_prg_1=len(df_prg_1)
@@ -58,7 +60,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
             continue
         else:
             len_prg_1-=1
-            E1=float(E_list1[0])##8分子に向けてep1,ep2作成　ep1:b ep2:a
+            E1=float(E_list1[0])-E_mono##8分子に向けてep1,ep2作成　ep1:b ep2:a
             df_E_1.loc[idx, ['E1','status']] = [E1,'Done']
             df_E_1.to_csv(auto_csv_1,index=False)
             #time.sleep(1)
@@ -80,7 +82,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
             continue
         else:
             len_prg_2 -= 1
-            E2 = float(E_list2[0])  # Updated to E2
+            E2 = float(E_list2[0]) -E_mono  # Updated to E2
             df_E_2.loc[idx, ['E2', 'status']] = [E2, 'Done']
             df_E_2.to_csv(auto_csv_2, index=False)  # Updated to auto_csv_2
             #time.sleep(1)
@@ -102,7 +104,7 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
             continue
         else:
             len_prg_3 -= 1
-            E3 = float(E_list3[0])  # Updated to E3
+            E3 = float(E_list3[0]) -E_mono # Updated to E3
             df_E_3.loc[idx, ['E3', 'status']] = [E3, 'Done']
             df_E_3.to_csv(auto_csv_3, index=False)  # Updated to auto_csv_3
             break  # Break after one iteration
