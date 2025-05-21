@@ -1,6 +1,6 @@
 ##tetracene層内計算
 import os
-os.environ['HOME'] ='/home/ohno'
+os.environ['HOME'] ='/home/HasegawaLab'
 import pandas as pd
 import time
 from make_8_xyz import exec_gjf##計算した点のxyzfileを出す
