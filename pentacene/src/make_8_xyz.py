@@ -8,7 +8,7 @@ MONOMER_LIST = ['C5','C6','C9','C28','C32','C33']
 ############################汎用関数###########################
 def get_monomer_xyzR(monomer_name,Ta,Tb,Tc,A2,A3):
     T_vec = np.array([Ta,Tb,Tc])
-    df_mono=pd.read_csv(f'/Home/HasegawaLab/ohno_amber/{monomer_name}/monomer/{monomer_name}.csv')
+    df_mono=pd.read_csv(f'/home/HasegawaLab/ohno_amber/{monomer_name}/monomer/{monomer_name}.csv')
     atoms_array_xyzR=df_mono[['X','Y','Z','R']].values
     ex = np.array([1.,0.,0.]); ey = np.array([0.,1.,0.]); ez = np.array([0.,0.,1.])
     xyz_array = atoms_array_xyzR[:,:3]
@@ -33,7 +33,7 @@ bond_lines=[' 1 1 2 ar\n', ' 2 1 3 ar\n', ' 3 1 7 ar\n', ' 4 2 4 ar\n', ' 5 2 9 
 line3='@<TRIPOS>SUBSTRUCTURE\n     1 RES1        1 GROUP             0 ****  ****    0  \n     2 RES2       25 GROUP             0 ****  ****    0 \n\n'
 
 para_list=[]
-with open(r'/Home/HasegawaLab/ohno_amber/pentacene/monomer/pent_mono.mol2')as f:
+with open(r'/home/HasegawaLab/ohno_amber/pentacene/monomer/pent_mono.mol2')as f:
     for line in f:
         #print(line)
         s=line.split()
