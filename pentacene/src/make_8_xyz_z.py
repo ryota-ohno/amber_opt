@@ -105,7 +105,9 @@ def make_xyzfile(monomer_name,params_dict,structure_type):
     elif structure_type == 2:##隣接8分子について対称性より3分子でエネルギー計算
         monomers_array_4 = np.concatenate([monomer_array_i,monomer_array_p2],axis=0)
     elif structure_type == 3:##隣接8分子について対称性より3分子でエネルギー計算
-        monomers_array_4 = np.concatenate([monomer_array_i,monomer_array_t1,monomer_array_t2],axis=0)
+        monomers_array_4 = np.concatenate([monomer_array_i,monomer_array_t1],axis=0)
+    elif structure_type == 4:##隣接8分子について対称性より3分子でエネルギー計算
+        monomers_array_4 = np.concatenate([monomer_array_i,monomer_array_t2],axis=0)
     
     for x,y,z,R in monomers_array_4:
         atom = R2atom(R)
