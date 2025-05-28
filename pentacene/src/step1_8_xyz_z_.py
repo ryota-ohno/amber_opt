@@ -3,7 +3,7 @@ import os
 os.environ['HOME'] ='/home/HasegawaLab'
 import pandas as pd
 import time
-from make_8_xyz import exec_gjf##計算した点のxyzfileを出す
+from make_8_xyz_z import exec_gjf##計算した点のxyzfileを出す
 from utils import get_E
 import argparse
 import numpy as np
@@ -19,23 +19,28 @@ def main_process(args):
     shutil.copy(f'/home/HasegawaLab/ohno_amber/amber_opt/{args.monomer_name}/src/FF_calc.in',amber_path)
     auto_csv_path = os.path.join(auto_dir,'step1.csv')
     if not os.path.exists(auto_csv_path):        
-        df_E = pd.DataFrame(columns = ['theta','a','b','E','E1','E2','E3','status'])##いじる
+        df_E = pd.DataFrame(columns = ['theta','a','za','b','zb','E','E1','E2','E3','status'])##いじる
         df_E.to_csv(auto_csv_path,index=False)##step3を二段階でやる場合二段階目ではinitをやらないので念のためmainにも組み込んでおく
 
     auto_csv_path1 = os.path.join(auto_dir,'step1_1.csv')
     if not os.path.exists(auto_csv_path1):        
-        df_E_1 = pd.DataFrame(columns = ['theta','a','E1','status','file_name'])##いじる
+        df_E_1 = pd.DataFrame(columns = ['theta','a','za','E1','status','file_name'])##いじる
         df_E_1.to_csv(auto_csv_path1,index=False)##step3を二段階でやる場合二段階目ではinitをやらないので念のためmainにも組み込んでおく
 
     auto_csv_path2 = os.path.join(auto_dir,'step1_2.csv')
     if not os.path.exists(auto_csv_path2):        
-        df_E_2 = pd.DataFrame(columns = ['theta','b','E2','status','file_name'])##いじる
+        df_E_2 = pd.DataFrame(columns = ['theta','b','zb','E2','status','file_name'])##いじる
         df_E_2.to_csv(auto_csv_path2,index=False)##step3を二段階でやる場合二段階目ではinitをやらないので念のためmainにも組み込んでおく
 
     auto_csv_path3 = os.path.join(auto_dir,'step1_3.csv')
     if not os.path.exists(auto_csv_path3):        
-        df_E_3 = pd.DataFrame(columns = ['theta','a','b','E3','status','file_name'])##いじる
+        df_E_3 = pd.DataFrame(columns = ['theta','a','za','b','zb','E3','status','file_name'])##いじる
         df_E_3.to_csv(auto_csv_path3,index=False)##step3を二段階でやる場合二段階目ではinitをやらないので念のためmainにも組み込んでおく
+
+    auto_csv_path4 = os.path.join(auto_dir,'step1_4.csv')
+    if not os.path.exists(auto_csv_path4):        
+        df_E_4 = pd.DataFrame(columns = ['theta','a','za','b','zb','E3','status','file_name'])##いじる
+        df_E_4.to_csv(auto_csv_path4,index=False)##step3を二段階でやる場合二段階目ではinitをやらないので念のためmainにも組み込んでおく
 
     os.chdir(os.path.join(args.auto_dir,'amber'))
     isOver = False
@@ -45,7 +50,7 @@ def main_process(args):
         time.sleep(0.1)
 
 def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取るか中身をばらして取るかの違い
-    fixed_param_keys = ['theta'];opt_param_keys_1 = ['a'];opt_param_keys_2 = ['b']
+    fixed_param_keys = ['theta'];opt_param_keys_1 = ['a','za'];opt_param_keys_2 = ['b','zb']
     
     mono_file=f'/home/HasegawaLab/ohno_amber/amber_opt/{monomer_name}/monomer/{monomer_name}_mono.out'
     E_mono=get_E(mono_file)[0]
@@ -64,17 +69,14 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
         else:
             len_prg_1-=1
             E1=float(E_list1[0])-2*E_mono##8分子に向けてep1,ep2作成　ep1:b ep2:a
-            E1=np.round(E1,4)
             df_E_1.loc[idx, ['E1','status']] = [round(E1,4),'Done']
             df_E_1.to_csv(auto_csv_1,index=False)
-            #time.sleep(1)
             break#2つ同時に計算終わったりしたらまずいので一個で切る
     
     auto_csv_2 = os.path.join(auto_dir,'step1_2.csv')
     df_E_2 = pd.read_csv(auto_csv_2)
     df_prg_2 = df_E_2.loc[df_E_2['status']=='InProgress', fixed_param_keys+opt_param_keys_2+['file_name']]
     len_prg_2 = len(df_prg_2)
-
     for idx, row in df_prg_2.iterrows():
         params_dict2_ = row[fixed_param_keys + opt_param_keys_2 + ['file_name']].to_dict()
         file_name2=params_dict2_['file_name']##辞書をつくってそこにopt_1とopt_2でファイル名作成
@@ -87,17 +89,14 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
         else:
             len_prg_2 -= 1
             E2 = float(E_list2[0]) -2*E_mono  # Updated to E2
-            E2=np.round(E2,4)
             df_E_2.loc[idx, ['E2', 'status']] = [round(E2,4), 'Done']
             df_E_2.to_csv(auto_csv_2, index=False)  # Updated to auto_csv_2
-            #time.sleep(1)
             break  # Break after one iteration
     
     auto_csv_3 = os.path.join(auto_dir, 'step1_3.csv')
     df_E_3 = pd.read_csv(auto_csv_3)
     df_prg_3 = df_E_3.loc[df_E_3['status'] == 'InProgress', fixed_param_keys + opt_param_keys_1 + opt_param_keys_2 + ['file_name']]
     len_prg_3 = len(df_prg_3)
-
     for idx, row in df_prg_3.iterrows():
         params_dict3_ = row[fixed_param_keys + opt_param_keys_1 + opt_param_keys_2 + ['file_name']].to_dict()
         file_name3=params_dict3_['file_name']##辞書をつくってそこにopt_1とopt_2でファイル名作成
@@ -110,9 +109,28 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
         else:
             len_prg_3 -= 1
             E3 = float(E_list3[0]) -2*E_mono # Updated to E3
-            E3=np.round(E3,4)
             df_E_3.loc[idx, ['E3', 'status']] = [round(E3,4), 'Done']
             df_E_3.to_csv(auto_csv_3, index=False)  # Updated to auto_csv_3
+            break  # Break after one iteration
+
+    auto_csv_4 = os.path.join(auto_dir, 'step1_4.csv')
+    df_E_4 = pd.read_csv(auto_csv_4)
+    df_prg_4 = df_E_4.loc[df_E_4['status'] == 'InProgress', fixed_param_keys + opt_param_keys_1 + opt_param_keys_2 + ['file_name']]
+    len_prg_4 = len(df_prg_4)
+    for idx, row in df_prg_4.iterrows():
+        params_dict4_ = row[fixed_param_keys + opt_param_keys_1 + opt_param_keys_2 + ['file_name']].to_dict()
+        file_name4=params_dict4_['file_name']##辞書をつくってそこにopt_1とopt_2でファイル名作成
+        log_filepath4 = os.path.join(*[auto_dir, 'amber', file_name4])
+        if not (os.path.exists(log_filepath4)):
+            continue
+        E_list4 = get_E(log_filepath4)
+        if len(E_list4) != 1:
+            continue
+        else:
+            len_prg_4 -= 1
+            E4 = float(E_list4[0]) -2*E_mono # Updated to E4
+            df_E_4.loc[idx, ['E4', 'status']] = [round(E4,4), 'Done']
+            df_E_4.to_csv(auto_csv_4, index=False)  # Updated to auto_csv_3
             break  # Break after one iteration
 
     auto_csv = os.path.join(auto_dir,'step1.csv')
@@ -123,18 +141,18 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
         params_dict1_ = row[fixed_param_keys + opt_param_keys_1].to_dict()
         params_dict2_ = row[fixed_param_keys + opt_param_keys_2].to_dict()
         params_dict3_ = row[fixed_param_keys + opt_param_keys_1 + opt_param_keys_2].to_dict()
-        s1=filter_df(df_E_1, params_dict1_);s2=filter_df(df_E_2, params_dict2_);s3=filter_df(df_E_3, params_dict3_)#['file_name']
-        s1=s1[s1['status']=='Done'];s2=s2[s2['status']=='Done'];s3=s3[s3['status']=='Done']
+        params_dict4_ = row[fixed_param_keys + opt_param_keys_1 + opt_param_keys_2].to_dict()
+        s1=filter_df(df_E_1, params_dict1_);s2=filter_df(df_E_2, params_dict2_);s3=filter_df(df_E_3, params_dict3_);s4=filter_df(df_E_4, params_dict4_)
+        s1=s1[s1['status']=='Done'];s2=s2[s2['status']=='Done'];s3=s3[s3['status']=='Done'];s4=s4[s4['status']=='Done']
     
-        if (len(s1) == 0) or (len(s2) == 0) or (len(s3) == 0):
+        if (len(s1) == 0) or (len(s2) == 0) or (len(s3) == 0) or (len(s4) == 0):
             continue
         else:
-            E1 = s1['E1'].values.tolist()[0]
-            E2 = s2['E2'].values.tolist()[0]
-            E3 = s3['E3'].values.tolist()[0]
+            E1 = s1['E1'].values.tolist()[0];E2 = s2['E2'].values.tolist()[0]
+            E3 = s3['E3'].values.tolist()[0];E4 = s4['E4'].values.tolist()[0]
             
-            E=2*E1+2*E2+4*E3
-            df_E.loc[idx, ['E','E1','E2','E3','status']] = [round(E,4),round(E1,4),round(E2,4),round(E3,4),'Done']
+            E=2*(E1+E2+E3+E4)
+            df_E.loc[idx, ['E','E1','E2','E3','E4','status']] = [round(E,4),round(E1,4),round(E2,4),round(E3,4),round(E4,4),'Done']
             df_E.to_csv(auto_csv,index=False)
             break#2つ同時に計算終わったりしたらまずいので一個で切る
     
@@ -144,13 +162,13 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
             params_dict=dict_matrix[i]#print(params_dict)
             params_dict1 = {k: v for k, v in params_dict.items() if (k in fixed_param_keys) or (k in opt_param_keys_1)}
             params_dict2 = {k: v for k, v in params_dict.items() if (k in fixed_param_keys) or (k in opt_param_keys_2)}
-            params_dict3 = params_dict
+            params_dict3 = params_dict;params_dict4 = params_dict
             alreadyCalculated = check_calc_status(auto_dir,params_dict)
             if not(alreadyCalculated):
                 df_E= pd.read_csv(os.path.join(auto_dir,'step1.csv'))
                 df_E_filtered = filter_df(df_E, params_dict)
                 if len(df_E_filtered) == 0:
-                    df_newline = pd.Series({**params_dict,'E':0.,'E1':0.,'E2':0.,'E3':0.,'status':'InProgress'})
+                    df_newline = pd.Series({**params_dict,'E':0.,'E1':0.,'E2':0.,'E3':0.,'E4':0.,'status':'InProgress'})
                     df_E_new=pd.concat([df_E,df_newline.to_frame().T],axis=0,ignore_index=True);df_E_new.to_csv(auto_csv,index=False)
                 
                 ## 1の実行　##
@@ -177,6 +195,13 @@ def listen(auto_dir,monomer_name,num_nodes,isTest):##args自体を引数に取�
                     file_name = exec_gjf(auto_dir, monomer_name, {**params_dict3},  structure_type=3,isTest=isTest)
                     df_newline_3 = pd.Series({**params_dict3,'E3':0.,'status':'InProgress','file_name':file_name})
                     df_E_new_3=pd.concat([df_E_3,df_newline_3.to_frame().T],axis=0,ignore_index=True);df_E_new_3.to_csv(auto_csv_3,index=False)
+                
+                auto_csv_4 = os.path.join(auto_dir,'step1_4.csv');df_E_4 = pd.read_csv(auto_csv_4)
+                df_sub_4 = filter_df(df_E_4, params_dict4)
+                if len(df_sub_4) == 0:
+                    file_name = exec_gjf(auto_dir, monomer_name, {**params_dict4},  structure_type=4,isTest=isTest)
+                    df_newline_4 = pd.Series({**params_dict4,'E4':0.,'status':'InProgress','file_name':file_name})
+                    df_E_new_4=pd.concat([df_E_4,df_newline_4.to_frame().T],axis=0,ignore_index=True);df_E_new_4.to_csv(auto_csv_4,index=False)
     
     init_params_csv=os.path.join(auto_dir, 'step1_init_params.csv')
     df_init_params = pd.read_csv(init_params_csv)
@@ -205,7 +230,7 @@ def get_params_dict(auto_dir, num_nodes):
     df_init_params = pd.read_csv(init_params_csv)
     df_cur = pd.read_csv(os.path.join(auto_dir, 'step1.csv'))
     df_init_params_inprogress = df_init_params[df_init_params['status']=='InProgress']
-    fixed_param_keys = ['theta'];opt_param_keys_1 = ['a'];opt_param_keys_2 = ['b']
+    fixed_param_keys = ['theta'];opt_param_keys_1 = ['a','za'];opt_param_keys_2 = ['b','zb']
     
     #最初の立ち上がり時
     if len(df_init_params_inprogress) < num_nodes:
@@ -223,7 +248,8 @@ def get_params_dict(auto_dir, num_nodes):
         fixed_params_dict = df_init_params.loc[index,fixed_param_keys].to_dict()
         isDone, opt_params_matrix = get_opt_params_dict(df_cur, init_params_dict,fixed_params_dict)
         if isDone:
-            opt_params_dict={'a':np.round(opt_params_matrix[0][0],1),'b':np.round(opt_params_matrix[0][1],1)}
+            opt_params_dict={'a':np.round(opt_params_matrix[0][0],1),'za':np.round(opt_params_matrix[0][1],1),
+                            'b':np.round(opt_params_matrix[0][2],1),'zb':np.round(opt_params_matrix[0][3],1)}
             # df_init_paramsのstatusをupdate
             df_init_params = update_value_in_df(df_init_params,index,'status','Done')
             if np.max(df_init_params.index) < index+1:##もうこれ以上は新しい計算は進まない
@@ -242,7 +268,8 @@ def get_params_dict(auto_dir, num_nodes):
 
         else:
             for i in range(len(opt_params_matrix)):
-                opt_params_dict={'a':np.round(opt_params_matrix[i][0],1),'b':np.round(opt_params_matrix[i][1],1)}
+                opt_params_dict={'a':np.round(opt_params_matrix[i][0],1),'za':np.round(opt_params_matrix[i][1],1),
+                            'b':np.round(opt_params_matrix[i][2],1),'zb':np.round(opt_params_matrix[i][3],1)}
                 d={**fixed_params_dict,**opt_params_dict}
                 dict_matrix.append(d)
                     #print(d)
@@ -250,25 +277,28 @@ def get_params_dict(auto_dir, num_nodes):
         
 def get_opt_params_dict(df_cur, init_params_dict,fixed_params_dict):
     df_val = filter_df(df_cur, fixed_params_dict)
-    a_init_prev = init_params_dict['a'];b_init_prev = init_params_dict['b']
+    a_init_prev = init_params_dict['a'];za_init_prev = init_params_dict['za']
+    b_init_prev = init_params_dict['b'];zb_init_prev = init_params_dict['zb']
     while True:
         E_list=[];xyz_list=[]
         para_list=[]
         for a in [a_init_prev-0.1,a_init_prev,a_init_prev+0.1]:
+            for za in [za_init_prev-0.1,za_init_prev,za_init_prev+0.1]:
                     for b in [b_init_prev-0.1,b_init_prev,b_init_prev+0.1]:
-                            a = np.round(a,1);b = np.round(b,1)
-                            df_val_xyz = df_val[(df_val['a']==a)&(df_val['b']==b)&(df_val['status']=='Done')]
+                        for zb in [zb_init_prev-0.1,zb_init_prev,zb_init_prev+0.1]:
+                            a = np.round(a,1);b = np.round(b,1);za = np.round(za,1);zb = np.round(zb,1)
+                            df_val_xyz = df_val[(df_val['a']==a)&(df_val['b']==b)&(df_val['za']==za)&(df_val['zb']==zb)&(df_val['status']=='Done')]
                             if len(df_val_xyz)==0:
-                                para_list.append([a,b])
+                                para_list.append([a,za,b,zb])
                                 continue
-                            xyz_list.append([a,b]);E_list.append(df_val_xyz['E'].values[0])
+                            xyz_list.append([a,za,b,zb]);E_list.append(df_val_xyz['E'].values[0])
         if len(para_list) != 0:
             return False,para_list
-        a_init,b_init = xyz_list[np.argmin(np.array(E_list))]
-        if a_init==a_init_prev and b_init==b_init_prev:
-            return True,[[a_init,b_init]]
+        a_init,za_init,b_init,zb_init = xyz_list[np.argmin(np.array(E_list))]
+        if a_init==a_init_prev and za_init==za_init_prev and b_init==b_init_prev and zb_init==zb_init_prev:
+            return True,[[a_init,za_init,b_init,zb_init]]
         else:
-            a_init_prev=a_init;b_init_prev=b_init
+            a_init_prev=a_init;za_init_prev=za_init;b_init_prev=b_init;zb_init_prev=zb_init
 
 def get_values_from_df(df,index,key):
     return df.loc[index,key]
