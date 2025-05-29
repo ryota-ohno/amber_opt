@@ -4,8 +4,6 @@ import pandas as pd
 import subprocess
 from utils import Rod, R2atom
 
-MONOMER_LIST = ['C5','C6','C9','C28','C32','C33']
-############################汎用関数###########################
 def get_monomer_xyzR(monomer_name,Ta,Tb,Tc,A2,A3):
     T_vec = np.array([Ta,Tb,Tc])
     df_mono=pd.read_csv(f'/home/HasegawaLab/ohno_amber/amber_opt/{monomer_name}/monomer/{monomer_name}.csv')
@@ -18,22 +16,18 @@ def get_monomer_xyzR(monomer_name,Ta,Tb,Tc,A2,A3):
     R_array = atoms_array_xyzR[:,3].reshape((-1,1))
     return np.concatenate([xyz_array,R_array],axis=1)
         
-line1='@<TRIPOS>MOLECULE\npentacene\n   72    80     2     0     0\nSMALL\nbcc\n\n\n@<TRIPOS>ATOM\n'
+line1='@<TRIPOS>MOLECULE\npentacene\n   48    54     2     0     0\nSMALL\nbcc\n\n\n@<TRIPOS>ATOM\n'
 line2='@<TRIPOS>BOND\n'
-bond_lines=[' 1 1 2 ar\n', ' 2 1 3 ar\n', ' 3 1 7 ar\n', ' 4 2 4 ar\n', ' 5 2 9 ar\n', ' 6 3 5 ar\n', ' 7 3 11 1\n', ' 8 4 6 ar\n', 
-            ' 9 4 14 1\n', ' 10 5 6 ar\n', ' 11 5 16 1\n', ' 12 6 15 1\n', ' 13 7 8 ar\n', ' 14 7 12 1\n', ' 15 8 10 ar\n', ' 16 8 17 ar\n', 
-            ' 17 9 10 ar\n', ' 18 9 13 1\n', ' 19 10 19 ar\n', ' 20 17 18 ar\n', ' 21 17 21 1\n', ' 22 18 20 ar\n', ' 23 18 23 ar\n', ' 24 19 20 ar\n', 
-            ' 25 19 22 1\n', ' 26 20 25 ar\n', ' 27 23 24 ar\n', ' 28 23 27 1\n', ' 29 24 26 ar\n', ' 30 24 29 ar\n', ' 31 25 26 ar\n', ' 32 25 28 1\n', 
-            ' 33 26 31 ar\n', ' 34 29 30 ar\n', ' 35 29 33 1\n', ' 36 30 32 ar\n', ' 37 30 34 1\n', ' 38 31 32 ar\n', ' 39 31 36 1\n', ' 40 32 35 1\n', 
-            ' 41 37 38 ar\n', ' 42 37 39 ar\n', ' 43 37 43 ar\n', ' 44 38 40 ar\n', ' 45 38 45 ar\n', ' 46 39 41 ar\n', ' 47 39 47 1\n', ' 48 40 42 ar\n', 
-            ' 49 40 50 1\n', ' 50 41 42 ar\n', ' 51 41 52 1\n', ' 52 42 51 1\n', ' 53 43 44 ar\n', ' 54 43 48 1\n', ' 55 44 46 ar\n', ' 56 44 53 ar\n', 
-            ' 57 45 46 ar\n', ' 58 45 49 1\n', ' 59 46 55 ar\n', ' 60 53 54 ar\n', ' 61 53 57 1\n', ' 62 54 56 ar\n', ' 63 54 59 ar\n', ' 64 55 56 ar\n', 
-            ' 65 55 58 1\n', ' 66 56 61 ar\n', ' 67 59 60 ar\n', ' 68 59 63 1\n', ' 69 60 62 ar\n', ' 70 60 65 ar\n', ' 71 61 62 ar\n', ' 72 61 64 1\n', 
-            ' 73 62 67 ar\n', ' 74 65 66 ar\n', ' 75 65 69 1\n', ' 76 66 68 ar\n', ' 77 66 70 1\n', ' 78 67 68 ar\n', ' 79 67 72 1\n', ' 80 68 71 1\n']
+bond_lines=[' 1 1 2 ar\n', ' 2 1 3 ar\n', ' 3 1 7 ar\n', ' 4 2 4 ar\n', ' 5 2 9 1\n', ' 6 3 5 ar\n', ' 7 3 21 1\n', ' 8 4 6 ar\n', ' 9 4 24 1\n',
+            ' 10 5 6 ar\n', ' 11 5 22 1\n', ' 12 6 23 1\n', ' 13 7 8 ar\n', ' 14 7 10 1\n', ' 15 8 9 1\n', ' 16 8 12 ar\n', ' 17 10 11 1\n', ' 18 11 12 ar\n',
+            ' 19 11 13 ar\n', ' 20 12 15 ar\n', ' 21 13 14 ar\n', ' 22 13 17 1\n', ' 23 14 16 ar\n', ' 24 14 18 1\n', ' 25 15 16 ar\n', ' 26 15 20 1\n', ' 27 16 19 1\n',
+            ' 28 25 26 ar\n', ' 29 25 27 ar\n', ' 30 25 31 ar\n', ' 31 26 28 ar\n', ' 32 26 33 1\n', ' 33 27 29 ar\n', ' 34 27 45 1\n', ' 35 28 30 ar\n', ' 36 28 48 1\n',
+            ' 37 29 30 ar\n', ' 38 29 46 1\n', ' 39 30 47 1\n', ' 40 31 32 ar\n', ' 41 31 34 1\n', ' 42 32 33 1\n', ' 43 32 36 ar\n', ' 44 34 35 1\n', ' 45 35 36 ar\n',
+            ' 46 35 37 ar\n', ' 47 36 39 ar\n', ' 48 37 38 ar\n', ' 49 37 41 1\n', ' 50 38 40 ar\n', ' 51 38 42 1\n', ' 52 39 40 ar\n', ' 53 39 44 1\n', ' 54 40 43 1\n']
 line3='@<TRIPOS>SUBSTRUCTURE\n     1 RES1        1 GROUP             0 ****  ****    0  \n     2 RES2       25 GROUP             0 ****  ****    0 \n\n'
 
 para_list=[]
-with open(r'/home/HasegawaLab/ohno_amber/amber_opt/pentacene/monomer/pent_mono.mol2')as f:
+with open(r'/home/HasegawaLab/ohno_amber/amber_opt/btbt/monomer/btbt_mono.mol2')as f:
     for line in f:
         #print(line)
         s=line.split()
